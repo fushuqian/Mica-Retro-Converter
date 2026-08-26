@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.yarn/cache/
+
+# Build outputs
+dist/
+build/
+out/
+src-tauri/target/
+.vite/
+__pycache__/
+*.py[cod]
+*.pyd
+.venv/
+venv/
+env/
+
+# ── FFmpeg binaries (must be placed by user, NOT in repo — too large for GitHub)
+ffmpeg/*.exe
+ffmpeg/*.dll
+!ffmpeg/.gitkeep
+
+# IDE / OS / logs
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tauri
+src-tauri/gen/
+
+# Test artifacts (sample input/output binaries)
+_conversion_test/*.asf
+_conversion_test/*.mp4
+_conversion_test/*.avi
+_conversion_test/*.wmv
+!_conversion_test/README.md

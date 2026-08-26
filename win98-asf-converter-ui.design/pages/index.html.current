@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win98 ASF 视频转换器</title>
+    <style id="theme-vars">
+:root {
+  /* Brand prefix: wac */
+  --wac-background: #0f1115;
+  --wac-foreground: #e8eaed;
+
+  --wac-surface: #161920;
+  --wac-surface-2: #1e222b;
+  --wac-surface-3: #262b36;
+
+  --wac-card: #161920;
+  --wac-card-foreground: #e8eaed;
+
+  --wac-popover: #1e222b;
+  --wac-popover-foreground: #e8eaed;
+
+  --wac-primary: #22aee6;
+  --wac-primary-foreground: #081016;
+
+  --wac-muted: #1e222b;
+  --wac-muted-foreground: #8b92a3;
+
+  --wac-border: #2a303c;
+  --wac-input: #1e222b;
+  --wac-ring: rgba(34, 174, 230, 0.45);
+
+  --wac-state-success: #34d399;
+  --wac-state-warning: #fbbf24;
+  --wac-state-error: #f87171;
+  --wac-state-info: #60a5fa;
+
+  --wac-radius-sm: 4px;
+  --wac-radius-md: 8px;
+  --wac-radius-lg: 12px;
+  --wac-radius-pill: 999px;
+
+  --wac-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 1px rgba(0, 0, 0, 0.15);
+  --wac-shadow-2: 0 8px 24px -8px rgba(0, 0, 0, 0.45);
+
+  /* shadcn/Tailwind semantic aliases */
+  --background: var(--wac-background);
+  --foreground: var(--wac-foreground);
+  --card: var(--wac-card);
+  --card-foreground: var(--wac-card-foreground);
+  --popover: var(--wac-popover);
+  --popover-foreground: var(--wac-popover-foreground);
+  --primary: var(--wac-primary);
+  --primary-foreground: var(--wac-primary-foreground);
+  --muted: var(--wac-muted);
+  --muted-foreground: var(--wac-muted-foreground);
+  --border: var(--wac-border);
+  --input: var(--wac-input);
+  --ring: var(--wac-ring);
+  --radius: var(--wac-radius-md);
+}
+
+@theme inline {
+  --color-background: var(--wac-background);
+  --color-foreground: var(--wac-foreground);
+  --color-card: var(--wac-card);
+  --color-card-foreground: var(--wac-card-foreground);
+  --color-popover: var(--wac-popover);
+  --color-popover-foreground: var(--wac-popover-foreground);
+  --color-primary: var(--wac-primary);
+  --color-primary-foreground: var(--wac-primary-foreground);
+  --color-muted: var(--wac-muted);
+  --color-muted-foreground: var(--wac-muted-foreground);
+  --color-border: var(--wac-border);
+  --color-input: var(--wac-input);
+  --color-ring: var(--wac-ring);
+  --radius-md: var(--wac-radius-md);
+}
+
+html {
+  font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--wac-background);
+  color: var(--wac-foreground);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--wac-background);
+    --color-foreground: var(--wac-foreground);
+    --color-card: var(--wac-card);
+    --color-card-foreground: var(--wac-card-foreground);
+    --color-popover: var(--wac-popover);
+    --color-popover-foreground: var(--wac-popover-foreground);
+    --color-primary: var(--wac-primary);
+    --color-primary-foreground: var(--wac-primary-foreground);
+    --color-muted: var(--wac-muted);
+    --color-muted-foreground: var(--wac-muted-foreground);
+    --color-border: var(--wac-border);
+    --color-input: var(--wac-input);
+    --color-ring: var(--wac-ring);
+    --radius-md: var(--wac-radius-md);
+    --radius-sm: var(--wac-radius-sm);
+    --radius-lg: var(--wac-radius-lg);
+  }
+  @layer base {
+    body { background: var(--wac-background); color: var(--wac-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--wac-background); }
+      .text-background { color: var(--wac-background); }
+      .border-background { border-color: var(--wac-background); }
+      .ring-background { --tw-ring-color: var(--wac-background); }
+      .bg-foreground { background-color: var(--wac-foreground); }
+      .text-foreground { color: var(--wac-foreground); }
+      .border-foreground { border-color: var(--wac-foreground); }
+      .ring-foreground { --tw-ring-color: var(--wac-foreground); }
+      .bg-card { background-color: var(--wac-card); }
+      .text-card { color: var(--wac-card); }
+      .border-card { border-color: var(--wac-card); }
+      .ring-card { --tw-ring-color: var(--wac-card); }
+      .bg-card-foreground { background-color: var(--wac-card-foreground); }
+      .text-card-foreground { color: var(--wac-card-foreground); }
+      .border-card-foreground { border-color: var(--wac-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--wac-card-foreground); }
+      .bg-popover { background-color: var(--wac-popover); }
+      .text-popover { color: var(--wac-popover); }
+      .border-popover { border-color: var(--wac-popover); }
+      .ring-popover { --tw-ring-color: var(--wac-popover); }
+      .bg-popover-foreground { background-color: var(--wac-popover-foreground); }
+      .text-popover-foreground { color: var(--wac-popover-foreground); }
+      .border-popover-foreground { border-color: var(--wac-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--wac-popover-foreground); }
+      .bg-primary { background-color: var(--wac-primary); }
+      .text-primary { color: var(--wac-primary); }
+      .border-primary { border-color: var(--wac-primary); }
+      .ring-primary { --tw-ring-color: var(--wac-primary); }
+      .bg-primary-foreground { background-color: var(--wac-primary-foreground); }
+      .text-primary-foreground { color: var(--wac-primary-foreground); }
+      .border-primary-foreground { border-color: var(--wac-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--wac-primary-foreground); }
+      .bg-muted { background-color: var(--wac-muted); }
+      .text-muted { color: var(--wac-muted); }
+      .border-muted { border-color: var(--wac-muted); }
+      .ring-muted { --tw-ring-color: var(--wac-muted); }
+      .bg-muted-foreground { background-color: var(--wac-muted-foreground); }
+      .text-muted-foreground { color: var(--wac-muted-foreground); }
+      .border-muted-foreground { border-color: var(--wac-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--wac-muted-foreground); }
+      .bg-border { background-color: var(--wac-border); }
+      .text-border { color: var(--wac-border); }
+      .border-border { border-color: var(--wac-border); }
+      .ring-border { --tw-ring-color: var(--wac-border); }
+      .bg-input { background-color: var(--wac-input); }
+      .text-input { color: var(--wac-input); }
+      .border-input { border-color: var(--wac-input); }
+      .ring-input { --tw-ring-color: var(--wac-input); }
+      .bg-ring { background-color: var(--wac-ring); }
+      .text-ring { color: var(--wac-ring); }
+      .border-ring { border-color: var(--wac-ring); }
+      .ring-ring { --tw-ring-color: var(--wac-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen grid grid-cols-[1.5fr_1fr] grid-rows-[auto_auto_1fr_auto_auto] gap-4 bg-background text-foreground px-5 py-4">
+      <!-- Top bar -->
+      <header data-region="top-bar" class="col-span-2 h-[60px] shrink-0 flex items-center justify-between px-5 border-b border-border bg-surface">
+        <div class="flex items-center gap-3">
+          <i data-lucide="file-video" class="w-5 h-5 text-primary"></i>
+          <h1 class="text-base font-semibold tracking-tight">Win98 ASF 视频转换器</h1>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-surface-2 text-muted-foreground border border-border">v2.4.0</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-border">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-success"></i>
+          <span class="text-xs font-medium text-foreground">ffmpeg 已就绪</span>
+        </div>
+      </header>
+
+      <!-- Drop zone -->
+      <section data-region="drop-zone" id="drop-zone" class="col-span-2 shrink-0 p-6 border-2 border-dashed border-border rounded-lg bg-surface hover:border-primary/60 hover:bg-surface-2 transition-colors cursor-pointer" style="display:block; min-height:96px;">
+        <div class="flex flex-col items-center justify-center gap-3 text-center">
+          <div class="w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center">
+            <i data-lucide="upload" class="w-6 h-6 text-primary"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-foreground">拖放视频文件到此处</p>
+            <p class="text-xs text-muted-foreground mt-1">支持 MP4 / MKV / AVI / MOV / WMV / FLV / TS；输出 ASF、WMV2、MPEG-1/2、DivX、Xvid、RealVideo</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- File queue -->
+      <div data-region="file-queue" id="file-queue" class="min-h-0 flex flex-col bg-surface border border-border rounded-lg overflow-hidden" style="display:flex; flex-direction:column; min-height:240px;">
+        <div class="h-12 shrink-0 px-4 flex items-center justify-between border-b border-border bg-surface">
+          <div class="flex items-center gap-2">
+            <i data-lucide="file-video" class="w-4 h-4 text-muted-foreground"></i>
+            <span class="text-sm font-semibold">文件队列</span>
+            <span class="text-xs text-muted-foreground">4 个文件</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-add-files" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 active:scale-95 transition">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              添加文件
+            </button>
+            <button id="btn-remove" type="button" disabled class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-muted text-foreground text-xs font-medium hover:bg-muted/80 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              移除选中
+            </button>
+            <button id="btn-clear" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-surface-2 text-foreground text-xs font-medium hover:bg-surface-3 active:scale-95 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              清空列表
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 overflow-y-auto divide-y divide-border">
+          <!-- Row 1 -->
+          <div class="px-4 py-3 hover:bg-surface-2/50 transition">
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <i data-lucide="file-video" class="w-4 h-4 text-muted-foreground shrink-0"></i>
+                <span class="text-sm font-medium truncate">movie.mp4</span>
+              </div>
+              <span class="status-pill status-info shrink-0">
+                转换中
+              </span>
+            </div>
+            <div class="progress-track mb-2">
+              <div class="progress-fill" style="width: 45%"></div>
+            </div>
+            <p class="text-xs text-muted-foreground truncate">C:\Output\movie.asf</p>
+          </div>
+          <!-- Row 2 -->
+          <div class="px-4 py-3 hover:bg-surface-2/50 transition">
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <i data-lucide="file-video" class="w-4 h-4 text-muted-foreground shrink-0"></i>
+                <span class="text-sm font-medium truncate">clip.mkv</span>
+              </div>
+              <span class="status-pill status-idle shrink-0">待转换</span>
+            </div>
+            <div class="progress-track mb-2">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <p class="text-xs text-muted-foreground truncate">C:\Output\clip.asf</p>
+          </div>
+          <!-- Row 3 -->
+          <div class="px-4 py-3 hover:bg-surface-2/50 transition">
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <i data-lucide="file-video" class="w-4 h-4 text-muted-foreground shrink-0"></i>
+                <span class="text-sm font-medium truncate">old_show.avi</span>
+              </div>
+              <span class="status-pill status-success shrink-0">
+                <i data-lucide="check-circle-2" class="w-3 h-3"></i>
+                完成
+              </span>
+            </div>
+            <div class="progress-track mb-2">
+              <div class="progress-fill" style="width: 100%"></div>
+            </div>
+            <p class="text-xs text-muted-foreground truncate">C:\Output\old_show.asf</p>
+          </div>
+          <!-- Row 4 -->
+          <div class="px-4 py-3 hover:bg-surface-2/50 transition">
+            <div class="flex items-start justify-between gap-3 mb-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <i data-lucide="file-video" class="w-4 h-4 text-muted-foreground shrink-0"></i>
+                <span class="text-sm font-medium truncate">travel.mov</span>
+              </div>
+              <span class="status-pill status-error shrink-0">
+                <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                失败
+              </span>
+            </div>
+            <div class="progress-track mb-2">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <p class="text-xs text-error truncate">编码器初始化失败：不支持的像素格式</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings panel -->
+      <div data-region="settings" class="min-h-0 flex flex-col bg-surface border border-border rounded-lg overflow-hidden" style="display:flex; flex-direction:column; min-height:240px;">
+        <div class="h-12 shrink-0 px-4 flex items-center gap-2 border-b border-border bg-surface">
+          <i data-lucide="settings" class="w-4 h-4 text-muted-foreground"></i>
+          <span class="text-sm font-semibold">转换设置</span>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-5">
+          <!-- Preset -->
+          <div class="space-y-2">
+            <label for="preset-select" class="text-xs font-medium text-muted-foreground">输出预设</label>
+            <select id="preset-select" class="w-full bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary">
+              <optgroup label="Windows 98 流媒体">
+                <option selected>ASF / WMV2 + WMA2（320×240）</option>
+                <option>ASF / WMV2 + WMA2（640×480）</option>
+              </optgroup>
+              <optgroup label="光盘兼容">
+                <option>VCD（MPEG-1，352×240）</option>
+                <option>SVCD（MPEG-2，480×576）</option>
+                <option>DVD（MPEG-2，720×576）</option>
+              </optgroup>
+              <optgroup label="MPEG-4">
+                <option>DivX 5 / MP3（640×480）</option>
+                <option>Xvid / MP3（640×480）</option>
+              </optgroup>
+              <optgroup label="RealNetworks">
+                <option>RealVideo 8 + Cook（320×240）</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Output dir -->
+          <div class="space-y-2">
+            <label for="output-dir" class="text-xs font-medium text-muted-foreground">输出目录</label>
+            <div class="flex items-center gap-2">
+              <input id="output-dir" type="text" value="C:\Output" class="flex-1 min-w-0 bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary" />
+              <button type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-muted text-foreground text-xs font-medium hover:bg-muted/80 active:scale-95 transition">
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
+                浏览
+              </button>
+            </div>
+          </div>
+
+          <!-- Resolution -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-2">
+              <label for="resolution-w" class="text-xs font-medium text-muted-foreground">宽度</label>
+              <input id="resolution-w" type="number" value="320" min="160" max="1920" class="w-full bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary" />
+            </div>
+            <div class="space-y-2">
+              <label for="resolution-h" class="text-xs font-medium text-muted-foreground">高度</label>
+              <input id="resolution-h" type="number" value="240" min="120" max="1080" class="w-full bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary" />
+            </div>
+          </div>
+
+          <!-- Bitrates -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-2">
+              <label for="video-bitrate" class="text-xs font-medium text-muted-foreground">视频码率（kbps）</label>
+              <input id="video-bitrate" type="number" value="500" min="64" max="8000" class="w-full bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary" />
+            </div>
+            <div class="space-y-2">
+              <label for="audio-bitrate" class="text-xs font-medium text-muted-foreground">音频码率（kbps）</label>
+              <input id="audio-bitrate" type="number" value="64" min="16" max="320" class="w-full bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary" />
+            </div>
+          </div>
+
+          <!-- FPS -->
+          <div class="space-y-2">
+            <label for="fps-select" class="text-xs font-medium text-muted-foreground">帧率</label>
+            <select id="fps-select" class="w-full bg-input border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary">
+              <option>15 fps</option>
+              <option selected>24 fps</option>
+              <option>25 fps</option>
+              <option>29.97 fps</option>
+              <option>30 fps</option>
+            </select>
+          </div>
+
+          <!-- Checkboxes -->
+          <div class="space-y-3 pt-1">
+            <label class="flex items-center gap-2.5 cursor-pointer group">
+              <input id="chk-letterbox" type="checkbox" class="w-4 h-4 rounded border-border bg-input text-primary focus:ring-2 focus:ring-ring" />
+              <span class="text-sm text-foreground group-hover:text-primary transition">4:3 适配（加黑边 letterbox）</span>
+            </label>
+            <label class="flex items-center gap-2.5 cursor-pointer group">
+              <input id="chk-subtitle" type="checkbox" checked class="w-4 h-4 rounded border-border bg-input text-primary focus:ring-2 focus:ring-ring" />
+              <span class="text-sm text-foreground group-hover:text-primary transition">自动烧录同名字幕</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log panel -->
+      <section data-region="log" id="log-panel" class="col-span-2 shrink-0 h-[180px] bg-background border border-border rounded-lg overflow-hidden flex flex-col" style="display:block; min-height:160px;">
+        <div class="h-9 shrink-0 px-3 flex items-center justify-between border-b border-border bg-surface">
+          <span class="text-xs font-semibold">日志</span>
+          <span class="text-[10px] text-muted-foreground">ffmpeg 7.0.2</span>
+        </div>
+        <pre class="flex-1 overflow-auto p-3 font-mono text-xs leading-relaxed text-muted-foreground"><code>[10:23:01] ffmpeg 7.0.2 检测完成，编码器已加载
+[10:23:02] 可用编码器：wmv2 / wmav2 / msmpeg4v2 / mpeg1video / mpeg2video / rv10 / ac3 / mp3
+[10:23:45] 开始转换：movie.mp4 -&gt; C:\Output\movie.asf [wmv2/wmav2 320x240]
+[10:23:45]   帧=  324 fps= 62 q=8.0 size=     768kB time=00:00:13.4 bitrate= 468.2kbits/s speed=2.56x
+[10:23:48] 完成：old_show.avi -&gt; C:\Output\old_show.asf（耗时 12.3s）
+[10:23:50] 错误：travel.mov 编码器初始化失败（不支持的像素格式 yuvj420p）</code></pre>
+      </section>
+
+      <!-- Action bar -->
+      <section data-region="actions" class="col-span-2 h-[64px] shrink-0 px-5 border-t border-border bg-surface flex items-center justify-between" style="display:block; min-height:56px;">
+        <div class="flex items-center gap-4 text-xs text-muted-foreground">
+          <span>总计 <strong class="text-foreground">4</strong> 个文件</span>
+          <span>转换中 <strong class="text-info">1</strong></span>
+          <span>完成 <strong class="text-success">1</strong></span>
+          <span>失败 <strong class="text-error">1</strong></span>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="btn-cancel" type="button" disabled class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-muted text-foreground text-sm font-medium hover:bg-muted/80 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <i data-lucide="square" class="w-4 h-4"></i>
+            取消
+          </button>
+          <button id="btn-convert" type="button" class="inline-flex items-center gap-2 px-5 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-95 shadow-sm transition">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            开始转换
+          </button>
+        </div>
+      </section>
+    </main>
+    <script>
+      if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+      document.querySelectorAll('button').forEach((b) => b.setAttribute('type', 'button'));
+    </script>
+
+    <style id="critical-layout">
+      .bg-surface { background-color: var(--wac-surface); }
+      .bg-surface-2 { background-color: var(--wac-surface-2); }
+      .bg-surface-3 { background-color: var(--wac-surface-3); }
+      .text-success { color: var(--wac-state-success); }
+      .text-warning { color: var(--wac-state-warning); }
+      .text-error { color: var(--wac-state-error); }
+      .text-info { color: var(--wac-state-info); }
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--wac-radius-pill);
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      .status-success { color: var(--wac-state-success); background-color: rgba(52, 211, 153, 0.12); }
+      .status-warning { color: var(--wac-state-warning); background-color: rgba(251, 191, 36, 0.12); }
+      .status-error { color: var(--wac-state-error); background-color: rgba(248, 113, 113, 0.12); }
+      .status-info { color: var(--wac-state-info); background-color: rgba(96, 165, 250, 0.12); }
+      .status-idle { color: var(--wac-muted-foreground); background-color: var(--wac-surface-2); }
+      .progress-track { background-color: var(--wac-surface-3); border-radius: var(--wac-radius-pill); overflow: hidden; height: 6px; }
+      .progress-fill { background-color: var(--wac-primary); height: 100%; border-radius: var(--wac-radius-pill); }
+      input[type="checkbox"] { accent-color: var(--wac-primary); }
+      .app-shell { height: 100vh; }
+      /* Fallback layout when Tailwind CDN is not loaded (e.g. headless validation) */
+      html, body { height: auto; margin: 0; }
+      main { display: grid; grid-template-columns: 1.5fr 1fr; grid-template-rows: auto auto 1fr auto auto; gap: 1rem; min-height: 100vh; box-sizing: border-box; }
+      section[data-region], div[data-region] { visibility: visible; }
+      [data-region="drop-zone"] { min-height: 96px; }
+      [data-region="file-queue"], [data-region="settings"] { min-height: 240px; }
+      [data-region="log"] { min-height: 160px; }
+      [data-region="actions"] { min-height: 56px; }
+    </style>
+
+    <style id="region-visibility">
+      [data-region="drop-zone"],
+      [data-region="file-queue"],
+      [data-region="settings"],
+      [data-region="log"],
+      [data-region="actions"] {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+        min-height: 48px;
+        box-sizing: border-box;
+      }
+      [data-region="file-queue"],
+      [data-region="settings"] {
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+</body>
+</html>

@@ -1,0 +1,326 @@
+{
+  "success": false,
+  "outcome": "validation_failed",
+  "repairable": true,
+  "terminalViolations": [],
+  "terminalBlockingSummary": null,
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": null,
+    "version_source": "unknown",
+    "runtime_skill_dir": null,
+    "recorded_at": null,
+    "expected_version": "2026.08.06.19.15.08",
+    "status": "observed_unknown",
+    "read_status": "unknown"
+  },
+  "operatingMode": "free-explore",
+  "renderBlockingErrorCount": 6,
+  "softWarningCount": 10,
+  "renderBlockingErrors": [
+    "[dispatch-changed-files] pages/index.html: controlled file changed after dispatch preflight without mainAgentPostDispatchMutations evidence: .design",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='drop-zone']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='file-queue']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='settings']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='log']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='actions']"
+  ],
+  "errorSignatures": [
+    {
+      "errorClass": "artifact-readiness",
+      "normalized": "[dispatch-changed-files] pages/index.html: controlled file changed after dispatch preflight without mainAgentPostDispatchMutations evidence: .design",
+      "signature": "8a7482f97820e4a6a47d2da836918bd31eb6df12445ec5b1d464a0f727c7450f"
+    },
+    {
+      "errorClass": "default-deliverable-visibility",
+      "normalized": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='drop-zone']",
+      "signature": "dca51944573753a8a104698947dfa02ccc76682c2953e8bd974a2fb65299187e"
+    },
+    {
+      "errorClass": "default-deliverable-visibility",
+      "normalized": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='file-queue']",
+      "signature": "ac173c7194d7d43644ad492bd742a55d5a7558c4c2f08609f646be578d4885c1"
+    },
+    {
+      "errorClass": "default-deliverable-visibility",
+      "normalized": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='settings']",
+      "signature": "f3ba161ab4f6e79061af9bf23feebdd2d41dba2256a3e5827745860aee1e105a"
+    },
+    {
+      "errorClass": "default-deliverable-visibility",
+      "normalized": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='log']",
+      "signature": "2004525649c723495fea41186a4dd38f356a528899546b23b1cc7b9d66a80d0e"
+    },
+    {
+      "errorClass": "default-deliverable-visibility",
+      "normalized": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='actions']",
+      "signature": "6a09b8945fd0d11f69efd585cb0fffe581cfc0869d95cea356581a75eb6a181e"
+    }
+  ],
+  "softWarnings": [
+    "[orchestration-summary] runtime-orchestration-summary.json is missing skillProvenance.name/version/version_source. Version provenance will be reported as observed_unknown by external evaluators.",
+    "[repair-ledger] validationRepairLedger[0].repairActions[0].preEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].repairActions[0].postEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].repairActions[1].preEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].repairActions[1].postEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].revalidationReportPath is missing",
+    "[repair-ledger] validationRepairLedger[0].revalidationReportHash is missing",
+    "[repair-ledger] validationRepairLedger[0].revalidationSuccess should be a boolean",
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--wac-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 1px rgba(0, 0, 0, 0.15), --wac-shadow-2: 0 8px 24px -8px rgba(0, 0, 0, 0.45)).",
+    "[html-quality] index.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference."
+  ],
+  "repairPlanHints": [
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "index.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    }
+  ],
+  "repairActionTable": [
+    {
+      "error": "[dispatch-changed-files] pages/index.html: controlled file changed after dispatch preflight without mainAgentPostDispatchMutations evidence: .design",
+      "errorClass": "artifact-readiness",
+      "severity": "blocking",
+      "action": "repair_design_registration_or_file_reference_only",
+      "owner": "main-agent",
+      "sourceReadPolicy": "read .design and affected file metadata only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='drop-zone']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='file-queue']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='settings']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='log']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='actions']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    }
+  ],
+  "errorCount": 6,
+  "warningCount": 10,
+  "errors": [
+    "[dispatch-changed-files] pages/index.html: controlled file changed after dispatch preflight without mainAgentPostDispatchMutations evidence: .design",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='drop-zone']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='file-queue']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='settings']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='log']",
+    "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='actions']"
+  ],
+  "warnings": [
+    "[orchestration-summary] runtime-orchestration-summary.json is missing skillProvenance.name/version/version_source. Version provenance will be reported as observed_unknown by external evaluators.",
+    "[repair-ledger] validationRepairLedger[0].repairActions[0].preEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].repairActions[0].postEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].repairActions[1].preEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].repairActions[1].postEditFileHashes[] is missing (legacy optional evidence)",
+    "[repair-ledger] validationRepairLedger[0].revalidationReportPath is missing",
+    "[repair-ledger] validationRepairLedger[0].revalidationReportHash is missing",
+    "[repair-ledger] validationRepairLedger[0].revalidationSuccess should be a boolean",
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--wac-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 1px rgba(0, 0, 0, 0.15), --wac-shadow-2: 0 8px 24px -8px rgba(0, 0, 0, 0.45)).",
+    "[html-quality] index.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference."
+  ],
+  "validationRunDisciplineStatus": {
+    "declared": true,
+    "restoreMode": false,
+    "maxFullValidationRuns": 2,
+    "validationHistoryCount": 1,
+    "repairLedgerCount": 1,
+    "softWarningsTriggerRepair": false,
+    "terminalState": null,
+    "nextAction": null,
+    "violations": [],
+    "success": true
+  },
+  "terminalState": null,
+  "nextCheck": {
+    "type": "full",
+    "command": "node \"c:\\Users\\fushu\\.trae-cn\\builtin\\design\\default\\skills\\solo-design\\shared-runtime\\deterministic-tooling\\validate-design-workspace.mjs\" \"c:\\Syncthing\\Trae Workspace\\win98-asf-converter-ui.design\" --report-json=\"c:\\Syncthing\\Trae Workspace\\win98-asf-converter-ui.design\\validation-report.json\"",
+    "fullValidationAllowed": true,
+    "reason": "no narrower deterministic targeted check is available for the current failure class"
+  },
+  "repairBatch": [
+    {
+      "error": "[dispatch-changed-files] pages/index.html: controlled file changed after dispatch preflight without mainAgentPostDispatchMutations evidence: .design",
+      "errorClass": "artifact-readiness",
+      "severity": "blocking",
+      "action": "repair_design_registration_or_file_reference_only",
+      "owner": "main-agent",
+      "sourceReadPolicy": "read .design and affected file metadata only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='drop-zone']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='file-queue']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='settings']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='log']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    },
+    {
+      "error": "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='actions']",
+      "errorClass": "unknown-blocking",
+      "severity": "blocking",
+      "action": "read validation report, classify owner, then use the narrowest targeted repair",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+    }
+  ],
+  "repairContextPacket": {
+    "schema_version": "1.0",
+    "purpose": "small-context repair packet; read this before full validation-report.json",
+    "success": false,
+    "terminalState": null,
+    "skillProvenance": {
+      "name": "solo-design",
+      "version": null,
+      "version_source": "unknown",
+      "runtime_skill_dir": null,
+      "recorded_at": null,
+      "expected_version": "2026.08.06.19.15.08",
+      "status": "observed_unknown",
+      "read_status": "unknown"
+    },
+    "renderBlockingErrorCount": 6,
+    "softWarningCount": 10,
+    "renderBlockingErrors": [
+      "[dispatch-changed-files] pages/index.html: controlled file changed after dispatch preflight without mainAgentPostDispatchMutations evidence: .design",
+      "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='drop-zone']",
+      "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='file-queue']",
+      "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='settings']",
+      "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='log']",
+      "[default-deliverable-visibility] pages/index.html: required visible selector not found: [data-region='actions']"
+    ],
+    "repairActionTable": [
+      {
+        "errorClass": "artifact-readiness",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "repair_design_registration_or_file_reference_only",
+        "affectedFiles": [],
+        "sourceReadPolicy": "read .design and affected file metadata only"
+      },
+      {
+        "errorClass": "unknown-blocking",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "read validation report, classify owner, then use the narrowest targeted repair",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+      },
+      {
+        "errorClass": "unknown-blocking",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "read validation report, classify owner, then use the narrowest targeted repair",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+      },
+      {
+        "errorClass": "unknown-blocking",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "read validation report, classify owner, then use the narrowest targeted repair",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+      },
+      {
+        "errorClass": "unknown-blocking",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "read validation report, classify owner, then use the narrowest targeted repair",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+      },
+      {
+        "errorClass": "unknown-blocking",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "read validation report, classify owner, then use the narrowest targeted repair",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no validator source read; targeted affected-file excerpt only"
+      }
+    ],
+    "nextCheck": {
+      "type": "full",
+      "command": "node \"c:\\Users\\fushu\\.trae-cn\\builtin\\design\\default\\skills\\solo-design\\shared-runtime\\deterministic-tooling\\validate-design-workspace.mjs\" \"c:\\Syncthing\\Trae Workspace\\win98-asf-converter-ui.design\" --report-json=\"c:\\Syncthing\\Trae Workspace\\win98-asf-converter-ui.design\\validation-report.json\"",
+      "fullValidationAllowed": true,
+      "reason": "no narrower deterministic targeted check is available for the current failure class"
+    },
+    "forbidden": [
+      "do not read validator source",
+      "do not rerun full validation when nextCheck.fullValidationAllowed=false",
+      "do not start preview/browser unless user explicitly asks",
+      "do not hand-edit repair ledger fields"
+    ]
+  },
+  "projectFileHashes": {
+    ".design": "d08b23b691f3e17198ede2db4c6a99b6e44e81af9faf0370923df1361d0f4ed4",
+    "colors_and_type.css": "6a086f794192ad8f41bcb2d3388e30ecc3306607ffe71bc25c75caac9d4ac339",
+    "runtime-orchestration-summary.json": "0d94324c3f11e5a5a5ffc7d4d53efe1a17601e0435148160c12489beab7fdd87",
+    "pages/index.html": "3acc76ceb0b3419e1ad7df026982f5cc31e52ab74c8f6befec95332e13af9588"
+  },
+  "designDir": "c:\\Syncthing\\Trae Workspace\\win98-asf-converter-ui.design",
+  "expectedPages": null,
+  "requireInteractions": null,
+  "checkedAt": "2026-08-25T14:39:36.283Z"
+}

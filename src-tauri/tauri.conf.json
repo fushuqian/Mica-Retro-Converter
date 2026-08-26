@@ -1,0 +1,45 @@
+{
+    "productName": "MICA RETRO CONVERTER",
+    "version": "2.0.0",
+    "identifier": "app.mica.retro.converter",
+    "build": {
+        "beforeBuildCommand": "npm run build",
+        "frontendDist": "../dist",
+        "devUrl": "http://127.0.0.1:1420",
+        "beforeDevCommand": "npm run dev:web"
+    },
+    "app": {
+        "windows": [
+            {
+                "label": "main",
+                "title": "MICA RETRO CONVERTER",
+                "width": 320,
+                "height": 640,
+                "minWidth": 320,
+                "maxWidth": 320,
+                "minHeight": 520,
+                "resizable": true,
+                "fullscreen": false,
+                "decorations": false,
+                "center": true,
+                "theme": "Light",
+                "transparent": false,
+                "dragDropEnabled": true
+            }
+        ],
+        "security": {
+            "csp": null,
+            "assetProtocol": {
+                "enable": true,
+                "scope": [
+                    "**"
+                ]
+            }
+        },
+        "withGlobalTauri": true
+    },
+    "bundle": {
+        "active": false
+    },
+    "plugins": {}
+}

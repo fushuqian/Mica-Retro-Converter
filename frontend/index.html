@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Win98 ASF 视频转换器</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部 -->
+    <header class="app-header">
+      <div class="app-title">
+        <div class="app-logo" aria-hidden="true">
+          <!-- Lucide: film -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
+            <line x1="7" y1="2" x2="7" y2="22"/>
+            <line x1="17" y1="2" x2="17" y2="22"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <line x1="2" y1="7" x2="7" y2="7"/>
+            <line x1="2" y1="17" x2="7" y2="17"/>
+            <line x1="17" y1="17" x2="22" y2="17"/>
+            <line x1="17" y1="7" x2="22" y2="7"/>
+          </svg>
+        </div>
+        <div class="app-title-text">
+          <h1>Win98 ASF 视频转换器</h1>
+          <p>把现代视频转成 Windows 98 能直接播放的格式 · WMV2 / MPEG-2 / DivX</p>
+        </div>
+      </div>
+      <div class="app-header-right">
+        <span class="status-pill" title="FFmpeg 状态">
+          <span class="status-dot idle" id="statusDot"></span>
+          <span id="statusText">初始化…</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- 主体 -->
+    <div class="main-grid">
+      <!-- 拖放 -->
+      <section class="area-drop">
+        <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="拖放或点击添加文件">
+          <div class="drop-icon">
+            <!-- Lucide: upload-cloud -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"/>
+              <line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/>
+            </svg>
+          </div>
+          <p class="drop-title">拖放视频到此处，或 <strong>点击选择文件</strong></p>
+          <p class="drop-subtitle">支持 MP4 · MKV · AVI · MOV · FLV · WMV · MPG · VOB · TS… <kbd>Shift</kbd> 可多选 &nbsp;·&nbsp; 也可直接拖入文件夹</p>
+        </div>
+      </section>
+
+      <!-- 文件队列 -->
+      <section class="area-queue">
+        <div class="glass-card">
+          <div class="card-title">
+            <!-- Lucide: list-video -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15V6a2 2 0 0 0-2-2H8.5a.5.5 0 0 1 0-1H19a4 4 0 0 1 4 4v2"/>
+              <rect x="2" y="6" width="14" height="16" rx="2"/>
+              <path d="m10 14-3 2V12l3 2Z"/>
+            </svg>
+            转换队列
+            <span style="margin-left:auto;color:var(--text-tertiary);font-weight:500;font-size:12px;text-transform:none;" id="queueCount">0 项</span>
+          </div>
+          <div class="file-table-wrap" id="fileTable">
+            <div class="empty-hint" id="emptyHint">
+              <!-- Lucide: folder-open -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 14a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3.93a1 1 0 0 1 .76.35l1.44 1.76a1 1 0 0 0 .76.35H18a1 1 0 0 1 1 1v2"/>
+                <path d="M3 17.5A2.5 2.5 0 0 0 5.5 20h12a2.5 2.5 0 0 0 2.45-2h0A2 2 0 0 0 18 16H5.5a2.5 2.5 0 0 0-2.5 2.5Z"/>
+              </svg>
+              还没有添加任何文件<br>
+              <span style="opacity:0.7">从上方拖放，或点击左侧「添加文件」按钮</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 设置面板 -->
+      <aside class="area-settings">
+        <div class="glass-card">
+          <div class="card-title">
+            <!-- Lucide: sliders -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="21" x2="4" y2="14"/>
+              <line x1="4" y1="10" x2="4" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12" y2="3"/>
+              <line x1="20" y1="21" x2="20" y2="16"/>
+              <line x1="20" y1="12" x2="20" y2="3"/>
+              <line x1="1" y1="14" x2="7" y2="14"/>
+              <line x1="9" y1="8" x2="15" y2="8"/>
+              <line x1="17" y1="16" x2="23" y2="16"/>
+            </svg>
+            转换设置
+          </div>
+          <div class="settings-body">
+            <!-- Preset -->
+            <div class="field">
+              <label class="field-label" for="presetSelect">输出预设</label>
+              <select class="select" id="presetSelect"></select>
+              <div class="preset-desc" id="presetDesc"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Output dir -->
+            <div class="field">
+              <label class="field-label">
+                输出目录
+                <span class="hint" id="outDirHint">默认与源文件同目录</span>
+              </label>
+              <div class="output-picker">
+                <input type="text" class="input" id="outputDir" placeholder="默认与源文件同目录…" readonly>
+                <button type="button" class="btn-pick" id="btnPickDir" title="选择输出目录">
+                  <!-- Lucide: folder-search -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="17" cy="17" r="3"/>
+                    <path d="m21 21-1.5-1.5"/>
+                    <path d="M10.5 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5.5"/>
+                    <path d="M8.85 4 10 7l-1.15 3a1 1 0 0 1-.95.7H3V3.3a.3.3 0 0 1 .3-.3h4.6a1 1 0 0 1 .95.7Z"/>
+                  </svg>
+                </button>
+                <button type="button" class="btn-pick" id="btnClearDir" title="清空，使用默认目录">
+                  <!-- Lucide: x -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18"/>
+                    <path d="m6 6 12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Resolution -->
+            <div class="field">
+              <label class="field-label" for="spinW">分辨率</label>
+              <div class="resolution-group">
+                <input type="number" class="input" id="spinW" min="160" max="1920" step="16" value="640">
+                <span class="res-sep">×</span>
+                <input type="number" class="input" id="spinH" min="120" max="1080" step="16" value="480">
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="spinVBit">视频码率</label>
+                <input type="number" class="input" id="spinVBit" min="100" max="8000" step="100" value="800">
+                <span class="hint" style="margin-top:2px;font-size:11px;color:var(--text-placeholder)">kbps</span>
+              </div>
+              <div class="field">
+                <label class="field-label" for="spinABit">音频码率</label>
+                <input type="number" class="input" id="spinABit" min="16" max="320" step="16" value="96">
+                <span class="hint" style="margin-top:2px;font-size:11px;color:var(--text-placeholder)">kbps</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="fpsSelect">帧率</label>
+              <select class="select" id="fpsSelect"></select>
+            </div>
+
+            <div class="divider"></div>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="chkLetterbox" checked>
+              <span class="box">
+                <!-- Lucide: check -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="cb-text">4:3 适配加黑边
+                <small>保持宽高比缩放到目标分辨率，上下/左右补黑边，避免画面被压扁</small>
+              </span>
+            </label>
+
+            <label class="checkbox-row">
+              <input type="checkbox" id="chkSubtitle" checked>
+              <span class="box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="cb-text">自动烧录同名字幕
+                <small>硬编码到视频中（.srt/.ass），Win98 播放器不支持软字幕</small>
+              </span>
+            </label>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 日志 -->
+      <section class="area-log">
+        <div class="glass-card">
+          <div class="card-title">
+            <!-- Lucide: terminal -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            运行日志
+            <span style="margin-left:auto">
+              <button class="btn-ghost btn" id="btnClearLog" style="padding:4px 10px;font-size:11px;">清空</button>
+            </span>
+          </div>
+          <div class="log-body" id="logBody">
+            <div class="log-line log-ev-warn"><span class="ts">—</span>等待启动…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 底部操作栏 -->
+      <section class="area-action">
+        <div class="action-bar">
+          <button class="btn" id="btnAddFiles">
+            <!-- Lucide: file-plus -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            添加文件
+          </button>
+          <button class="btn btn-ghost" id="btnRemoveSel">
+            <!-- Lucide: trash-2 -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            移除选中
+          </button>
+          <button class="btn btn-ghost" id="btnClearAll">
+            <!-- Lucide: list-x -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="m16 12 5 5"/><path d="m21 12-5 5"/></svg>
+            清空列表
+          </button>
+          <div class="spacer"></div>
+          <button class="btn btn-danger" id="btnCancel" disabled>
+            <!-- Lucide: square -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            取消
+          </button>
+          <button class="btn btn-primary" id="btnConvert" disabled>
+            <!-- Lucide: play -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            开始转换
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
