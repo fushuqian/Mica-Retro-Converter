@@ -119,6 +119,27 @@ fn open_dir_dialog(app: tauri::AppHandle) -> Result<Option<String>, String> {
 fn spawn_backend(port: u16) -> Result<Child> {
     let script = locate_server_script();
     let python = which_python();
+
+    // sidecar 日志输出到 sidecar.log（项目根目录），方便查问题
+    let log_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join("sidecar.log");
+    let log_file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&log_path)
+        .ok();
+    let (stdout, stderr) = match log_file {
+        Some(f) => {
+            let f2 = f.try_clone().unwrap_or_else(|_| {
+                // clone 失败就 stderr 丢弃
+                std::fs::File::open("nul").expect("nul 设备打开失败")
+            });
+            (Stdio::from(f), Stdio::from(f2))
+        }
+        None => (Stdio::null(), Stdio::null()),
+    };
+
     let child = Command::new(python)
         .arg("-u")
         .arg(script)
@@ -126,8 +147,8 @@ fn spawn_backend(port: u16) -> Result<Child> {
         .env("WAC_PORT", port.to_string())
         .env("PYTHONUNBUFFERED", "1")
         .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
+        .stdout(stdout)
+        .stderr(stderr)
         .spawn()
         .with_context(|| "启动 Python sidecar 失败（请确认已安装 Python 3.8+）")?;
     Ok(child)

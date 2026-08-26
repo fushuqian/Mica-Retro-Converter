@@ -129,7 +129,12 @@
         updateConvertButton();
         changed = true;
       }
-      if (changed) renderTaskList();
+      if (changed) {
+        for (const f of state.files) {
+          const card = dom.taskList.querySelector(`.task-card[data-id="${f.id}"]`);
+          if (card) updateTaskCardProgress(card, f);
+        }
+      }
     } catch (_) {}
   }
 
@@ -224,7 +229,7 @@
         card = createTaskCard(f);
         dom.taskList.appendChild(card);
       } else {
-        updateTaskCard(card, f);
+        updateTaskCardProgress(card, f);
       }
       card.style.order = String(order++);
     }
@@ -240,12 +245,15 @@
       <div class="card-header">
         <div class="card-icon">🎬</div>
         <div class="card-info">
-          <div class="card-name"></div>
-          <div class="card-meta">
-            <span class="card-size"></span>
+          <div class="card-name-row">
+            <span class="chip chip-format"></span>
+            <div class="card-name-wrap">
+              <div class="card-name" title=""></div>
+            </div>
+            <button class="card-remove" title="Remove">✖️</button>
           </div>
+          <div class="card-chips"></div>
         </div>
-        <button class="card-remove" title="Remove">✖️</button>
       </div>
       <div class="card-progress-row">
         <div class="progress-bar"><div class="progress-fill"></div></div>
@@ -261,23 +269,100 @@
       if (i >= 0) { state.files.splice(i, 1); renderTaskList(); }
     });
     
-    updateTaskCard(card, f);
+    updateTaskCardMeta(card, f);
+    updateTaskCardProgress(card, f);
     return card;
   }
 
-  function updateTaskCard(card, f) {
+  function updateTaskCardMeta(card, f) {
+    // format chip
+    const fmtEl = card.querySelector('.chip-format');
+    if (fmtEl) {
+      const fmt = fileFormat(f.name);
+      fmtEl.textContent = fmt;
+      fmtEl.style.display = fmt ? 'inline-flex' : 'none';
+    }
+
     const nameEl = card.querySelector('.card-name');
     nameEl.textContent = f.name;
     nameEl.title = f.path;
-    card.querySelector('.card-size').textContent = humanSize(f.size) || 'Unknown';
+
+    // marquee scroll for long names
+    const nameWrap = card.querySelector('.card-name-wrap');
+    if (nameWrap) {
+      nameWrap.classList.remove('marquee');
+      nameEl.style.animationDuration = '';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (nameEl.scrollWidth > nameWrap.clientWidth + 2) {
+            const overflow = nameEl.scrollWidth - nameWrap.clientWidth;
+            nameEl.style.setProperty('--marquee-distance', `-${overflow}px`);
+            const duration = Math.max(3, overflow / 30);
+            nameWrap.classList.add('marquee');
+            nameEl.style.animationDuration = duration + 's';
+          }
+        });
+      });
+    }
     
+    // chips
+    const chipsEl = card.querySelector('.card-chips');
+    if (f.info && !f.info.error) {
+      chipsEl.innerHTML = '';
+      const chips = buildChipsForInfo(f.info);
+      for (const chip of chips) {
+        const el = document.createElement('span');
+        el.className = 'chip chip-' + chip.cls;
+        el.textContent = chip.text;
+        chipsEl.appendChild(el);
+      }
+      chipsEl.style.display = chips.length ? 'flex' : 'none';
+    } else {
+      chipsEl.style.display = 'none';
+    }
+  }
+
+  function updateTaskCardProgress(card, f) {
     const fill = card.querySelector('.progress-fill');
-    fill.style.width = (f.progress || 0) + '%';
-    card.querySelector('.progress-text').textContent = (f.progress || 0) + '%';
+    if (fill) fill.style.width = (f.progress || 0) + '%';
+    const pt = card.querySelector('.progress-text');
+    if (pt) pt.textContent = (f.progress || 0) + '%';
     
     const stateEl = card.querySelector('.progress-state');
-    stateEl.textContent = f.status || '⏳ Waiting';
-    stateEl.className = 'progress-state ' + statusCls(f.status);
+    if (stateEl) {
+      stateEl.textContent = f.status || 'Waiting';
+      stateEl.className = 'progress-state ' + statusCls(f.status);
+    }
+  }
+
+  function updateTaskCard(card, f) {
+    updateTaskCardMeta(card, f);
+    updateTaskCardProgress(card, f);
+  }
+
+  function fileFormat(name) {
+    const m = name.match(/\.([a-zA-Z0-9]+)$/);
+    return m ? m[1].toUpperCase() : '';
+  }
+
+  function buildChipsForInfo(info) {
+    const chips = [];
+    // Video chip: codec resolution fps aspect_ratio bitrate
+    if (info.video_codec) {
+      const parts = [codecLabel(info.video_codec)];
+      if (info.width && info.height) parts.push(info.width + 'x' + info.height);
+      if (info.fps) parts.push(info.fps + 'FPS');
+      if (info.aspect_ratio) parts.push(info.aspect_ratio);
+      if (info.bitrate) parts.push(humanBitrate(info.bitrate));
+      chips.push({ cls: 'video', text: '🎬 ' + parts.join(' ') });
+    }
+    // Audio chip: codec bitrate
+    if (info.audio_codec) {
+      const parts = [codecLabel(info.audio_codec)];
+      if (info.audio_bitrate) parts.push(humanBitrate(info.audio_bitrate));
+      chips.push({ cls: 'audio', text: '🔊 ' + parts.join(' ') });
+    }
+    return chips;
   }
 
   function updateOutputPathDisplay() {
@@ -297,6 +382,55 @@
     let i = 0, v = bytes;
     while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
     return v.toFixed(v >= 100 || i === 0 ? 0 : 1) + ' ' + units[i];
+  }
+
+  function humanBitrate(bps) {
+    if (!bps) return '';
+    if (bps >= 1000000) return Math.round(bps / 1000000) + ' Mbps';
+    if (bps >= 1000) return Math.round(bps / 1000) + ' kbps';
+    return bps + ' bps';
+  }
+
+  function codecLabel(codec) {
+    if (!codec) return '';
+    const map = {
+      'h264': 'H.264', 'hevc': 'H.265', 'av1': 'AV1', 'vp9': 'VP9',
+      'vp8': 'VP8', 'mpeg4': 'MPEG-4', 'mpeg2video': 'MPEG-2',
+      'mpeg1video': 'MPEG-1', 'wmv2': 'WMV2', 'wmv3': 'WMV3',
+      'rv10': 'RealVideo', 'rv20': 'RealVideo 2',
+      'libx264': 'H.264', 'libx265': 'H.265', 'libxvid': 'Xvid',
+      'libvpx': 'VP8', 'libvpx-vp9': 'VP9',
+      'aac': 'AAC', 'mp3': 'MP3', 'opus': 'Opus', 'vorbis': 'Vorbis',
+      'ac3': 'AC3', 'ac3_fixed': 'AC3',
+      'wmav2': 'WMAv2', 'wma': 'WMA',
+      'real_144': 'RealAudio', 'ra_144': 'RealAudio',
+      'mp2': 'MP2', 'pcm_s16le': 'PCM', 'pcm_s16be': 'PCM',
+      'flac': 'FLAC', 'alac': 'ALAC', 'ape': 'APE',
+    };
+    return map[codec] || codec.toUpperCase();
+  }
+
+  async function fetchFileInfo(path) {
+    try {
+      const encodedPath = encodeURIComponent(path);
+      const data = await api('GET', '/api/files/info?path=' + encodedPath);
+      return data;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function enrichFilesWithMeta(files) {
+    for (const f of files) {
+      if (f.info) continue;
+      fetchFileInfo(f.path).then(info => {
+        if (info) {
+          f.info = info;
+          const card = dom.taskList.querySelector(`.task-card[data-id="${f.id}"]`);
+          if (card) updateTaskCardMeta(card, f);
+        }
+      });
+    }
   }
 
   function statusCls(status) {
@@ -336,8 +470,8 @@
       if (!p || existPaths.has(p)) continue;
       const ext = p.match(/\.([^.\/]+)$/)?.[1]?.toLowerCase();
       if (!ext || !SUPPORTED_EXTS.has('.' + ext)) continue;
-      const name = p.split(/[\/]/).pop() || p;
-      state.files.push({
+      const name = p.split(/[\\\/]/).pop() || p;
+      const fileObj = {
         id: uid(),
         path: p,
         name,
@@ -345,12 +479,17 @@
         progress: 0,
         status: 'Waiting',
         output: null,
-      });
+        info: null,
+      };
+      state.files.push(fileObj);
       existPaths.add(p);
       added++;
     }
     renderTaskList();
     if (added > 0) toast('success', 'Added ' + added + ' file(s)');
+    // async fetch metadata for newly added files
+    const newFiles = state.files.filter(f => !f.info);
+    if (newFiles.length) enrichFilesWithMeta(newFiles);
     return added;
   }
 
@@ -425,13 +564,13 @@
           const now = Date.now();
           // Dedupe vs HTML5 fallback (both may fire within same drop)
           try {
-            if ((window as any).__lastDragDropTs && now - (window as any).__lastDragDropTs < 500) return;
-            (window as any).__lastDragDropTs = now;
+            if (window.__lastDragDropTs && now - window.__lastDragDropTs < 500) return;
+            window.__lastDragDropTs = now;
             // update closure lastDropAt too
             try { (0, eval)('lastDropAt = ' + now + ';'); } catch(_) {}
           } catch(_) {}
 
-          const payload = (ev?.payload || {}) as { paths?: string[] };
+          const payload = (ev?.payload || {});
           const paths = Array.isArray(payload.paths) ? payload.paths : [];
           console.debug('[DnD] drag://drop (Rust FileDrop) paths =', JSON.stringify(paths));
 
@@ -486,7 +625,7 @@
       dragCounter = 0;
       setDragHover(false);
       // Shared dedupe window (Rust drag://drop also writes this key)
-      const W = window as any;
+      const W = window;
       const now = Date.now();
       if (W.__lastDragDropTs && now - W.__lastDragDropTs < 500) return;
       W.__lastDragDropTs = now;
@@ -562,7 +701,8 @@
 
   function connectEventSource() {
     if (state.eventSource) try { state.eventSource.close(); } catch {}
-    const url = API_BASE + '/api/events?since=' + (state.lastEventTs || '');
+    let url = API_BASE + '/api/events';
+    if (state.lastEventTs > 0) url += '?since=' + state.lastEventTs;
     const es = new EventSource(url, { withCredentials: false });
     state.eventSource = es;
 
@@ -578,12 +718,20 @@
     switch (event) {
       case 'progress': {
         const f = state.files.find(x => x.name === payload.name);
-        if (f) { f.progress = payload.percent; renderTaskList(); }
+        if (f) {
+          f.progress = payload.percent;
+          const card = dom.taskList.querySelector(`.task-card[data-id="${f.id}"]`);
+          if (card) updateTaskCardProgress(card, f);
+        }
         break;
       }
       case 'file_started': {
         const f = state.files.find(x => x.name === payload.name);
-        if (f) { f.status = 'Running...'; f.progress = 0; renderTaskList(); }
+        if (f) {
+          f.status = 'Running...'; f.progress = 0;
+          const card = dom.taskList.querySelector(`.task-card[data-id="${f.id}"]`);
+          if (card) updateTaskCardProgress(card, f);
+        }
         break;
       }
       case 'file_finished': {
@@ -596,7 +744,8 @@
           } else {
             f.status = 'Failed';
           }
-          renderTaskList();
+          const card = dom.taskList.querySelector(`.task-card[data-id="${f.id}"]`);
+          if (card) updateTaskCardProgress(card, f);
         }
         break;
       }

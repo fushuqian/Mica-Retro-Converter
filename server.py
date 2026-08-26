@@ -18,9 +18,9 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
@@ -278,8 +278,16 @@ def convert_status():
 
 
 @app.get("/api/events")
-async def event_stream(since: float | None = None):
-    """SSE 事件流。客户端建立长连接后，立即发送一次回放，之后实时推送。"""
+async def event_stream(since: str | None = None):
+    """SSE 事件流。客户端建立长连接后，立即发送一次回放，之后实时推送。
+    since 参数兼容：缺失 / None / 空字符串 / 非数字 都视为“从头（或最近 200 条）回放”。"""
+    # 兼容：?since=（空字符串）也要视为 None，避免 FastAPI 解析失败
+    since_val: float | None = None
+    if isinstance(since, str) and since.strip():
+        try:
+            since_val = float(since.strip())
+        except (ValueError, TypeError):
+            since_val = None
     sess = SERVER_STATE.session
     if sess is None:
         # 创建空会话，确保后续有地方挂 listener
@@ -294,7 +302,7 @@ async def event_stream(since: float | None = None):
             # 先发 replay（recent logs）
             yield "retry: 3000\n\n"
             for line in sess.log_lines[-200:]:
-                if since is None or json.loads(line).get("ts", 0) >= since:
+                if since_val is None or json.loads(line).get("ts", 0) >= since_val:
                     yield f"data: {line}\n\n"
             while True:
                 msg = await q.get()
@@ -359,7 +367,7 @@ def dialog_open_dir():
 
 @app.get("/api/files/validate")
 def validate_files(paths: str):
-    """GET ?paths=p1|p2|p3 批量校验文件是否存在且为支持的视频格式"""
+    """GET ?paths=p1|p2|p3 批量校验文件是否存在且为支持的视频格式，同时返回元数据"""
     result = []
     for p in paths.split("|"):
         p = p.strip()
@@ -367,8 +375,31 @@ def validate_files(paths: str):
             continue
         exists = os.path.isfile(p)
         ext_ok = os.path.splitext(p)[1].lower() in core.SUPPORTED_EXTS
-        result.append({"path": p, "exists": exists, "supported": ext_ok, "size": os.path.getsize(p) if exists else 0})
+        item = {"path": p, "exists": exists, "supported": ext_ok, "size": os.path.getsize(p) if exists else 0}
+        if exists and ext_ok and SERVER_STATE.ffprobe:
+            try:
+                info = core.probe_video_info(SERVER_STATE.ffprobe, p)
+                if "error" not in info:
+                    item["info"] = info
+            except Exception:
+                pass
+        result.append(item)
     return {"items": result}
+
+
+@app.get("/api/files/info")
+def get_file_info(path: str):
+    """GET ?path=<filepath> 返回单个文件的视频元数据"""
+    if not path:
+        raise HTTPException(400, "path is required")
+    if not os.path.isfile(path):
+        raise HTTPException(404, "file not found")
+    if not SERVER_STATE.ffprobe:
+        raise HTTPException(503, "ffprobe not available")
+    info = core.probe_video_info(SERVER_STATE.ffprobe, path)
+    if "error" in info:
+        raise HTTPException(500, info["error"])
+    return info
 
 
 # ────────── 前端静态文件 ──────────

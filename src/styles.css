@@ -267,6 +267,20 @@ body {
   min-width: 0;
 }
 
+.card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  position: relative;
+}
+
+.card-name-wrap {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
 .card-name {
   font-size: 13px;
   font-weight: 500;
@@ -276,10 +290,49 @@ body {
   text-overflow: ellipsis;
 }
 
-.card-meta {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 3px;
+.card-name-wrap.marquee .card-name {
+  overflow: visible;
+  text-overflow: clip;
+  animation: marquee-scroll linear infinite;
+}
+
+@keyframes marquee-scroll {
+  0%, 8%   { transform: translateX(0); }
+  92%, 100% { transform: translateX(var(--marquee-distance, -100%)); }
+}
+
+.card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 8px;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.chip-format {
+  background: rgba(100, 116, 139, 0.15);
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.chip-video {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.chip-audio {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
 }
 
 .card-progress-row {
@@ -334,8 +387,8 @@ body {
 }
 
 .card-remove {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -345,15 +398,20 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  font-size: 11px;
+  font-size: 10px;
   padding: 0;
-  opacity: 0.4;
+  opacity: 0.3;
+  flex-shrink: 0;
 }
 
 .card-remove:hover {
   opacity: 1;
   background: rgba(239, 68, 68, 0.12);
   color: var(--error-color);
+}
+
+.task-card:hover .card-remove {
+  opacity: 0.6;
 }
 
 .bottom-bar {

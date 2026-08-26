@@ -207,6 +207,101 @@ def get_media_duration(ffprobe_path: str, file_path: str) -> float | None:
         return None
 
 
+def probe_video_info(ffprobe_path: str, file_path: str) -> dict:
+    """通过 ffprobe 获取视频元数据：视频/音频编码、分辨率、帧率、码率、时长等。
+    返回 dict，失败时返回含 error 键的 dict。"""
+    info = {
+        "video_codec": None, "audio_codec": None,
+        "width": None, "height": None,
+        "fps": None, "bitrate": None,
+        "duration": None, "audio_bitrate": None,
+        "aspect_ratio": None,
+    }
+    if not ffprobe_path:
+        info["error"] = "ffprobe not found"
+        return info
+    try:
+        result = subprocess.run(
+            [ffprobe_path, "-v", "quiet",
+             "-print_format", "json",
+             "-show_streams",
+             "-show_format",
+             file_path],
+            capture_output=True, text=True, timeout=20,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+        )
+        if result.returncode != 0:
+            info["error"] = result.stderr.strip() or "ffprobe failed"
+            return info
+        data = json.loads(result.stdout)
+        streams = data.get("streams", [])
+        fmt = data.get("format", {})
+
+        # duration
+        dur = fmt.get("duration")
+        if dur:
+            try:
+                info["duration"] = round(float(dur), 1)
+            except (ValueError, TypeError):
+                pass
+
+        # video stream
+        vs = None
+        for s in streams:
+            if s.get("codec_type") == "video":
+                vs = s
+                break
+        if vs:
+            info["video_codec"] = vs.get("codec_name")
+            info["width"] = int(vs.get("width", 0)) or None
+            info["height"] = int(vs.get("height", 0)) or None
+            # display aspect ratio (e.g. "4:3", "16:9")
+            dar = vs.get("display_aspect_ratio")
+            if dar:
+                info["aspect_ratio"] = dar
+            # fps
+            fps_str = vs.get("r_frame_rate", "")
+            if fps_str and "/" in fps_str:
+                try:
+                    num, den = fps_str.split("/")
+                    if float(den) != 0:
+                        info["fps"] = round(float(num) / float(den), 2)
+                except (ValueError, ZeroDivisionError):
+                    pass
+            # video bitrate
+            vbr = vs.get("bit_rate")
+            if vbr:
+                try:
+                    info["bitrate"] = int(vbr)
+                except (ValueError, TypeError):
+                    pass
+
+        # audio stream
+        for s in streams:
+            if s.get("codec_type") == "audio":
+                info["audio_codec"] = s.get("codec_name")
+                abr = s.get("bit_rate")
+                if abr:
+                    try:
+                        info["audio_bitrate"] = int(abr)
+                    except (ValueError, TypeError):
+                        pass
+                break
+
+        # fallback: format-level bitrate if stream-level not found
+        if not info.get("bitrate") and fmt.get("bit_rate"):
+            try:
+                info["bitrate"] = int(fmt["bit_rate"])
+            except (ValueError, TypeError):
+                pass
+
+    except subprocess.TimeoutExpired:
+        info["error"] = "ffprobe timed out"
+    except Exception as e:
+        info["error"] = str(e)
+    return info
+
+
 def find_subtitle_for_video(video_path: str) -> str | None:
     """自动查找与视频同名的字幕文件（.srt/.ass/.ssa/.sub）"""
     p = Path(video_path)
