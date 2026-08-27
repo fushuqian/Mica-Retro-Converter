@@ -39,3 +39,9 @@ _conversion_test/*.mp4
 _conversion_test/*.avi
 _conversion_test/*.wmv
 !_conversion_test/README.md
+# WPF build outputs
+wpf/bin/
+wpf/obj/
+
+# 过时实现暂存区，待删除，不入仓库
+toberemoved/
