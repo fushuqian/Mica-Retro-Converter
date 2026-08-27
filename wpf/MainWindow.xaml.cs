@@ -227,6 +227,12 @@ public partial class MainWindow : FluentWindow
         }
     }
 
+    private void RemoveFile_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is FileItem item)
+            _files.Remove(item);
+    }
+
     private async void Start_Click(object sender, RoutedEventArgs e)
     {
         if (_ffmpeg is null)
