@@ -54,9 +54,10 @@
                           KeyDown="FileListView_KeyDown">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="文件" Width="330" DisplayMemberBinding="{Binding DisplayName}" />
-                            <GridViewColumn Header="状态" Width="110" DisplayMemberBinding="{Binding Status}" />
-                            <GridViewColumn Header="进度" Width="80" DisplayMemberBinding="{Binding ProgressText}" />
+                            <GridViewColumn Header="文件" Width="230" DisplayMemberBinding="{Binding DisplayName}" />
+                            <GridViewColumn Header="文件信息" Width="280" DisplayMemberBinding="{Binding Info}" />
+                            <GridViewColumn Header="状态" Width="90" DisplayMemberBinding="{Binding Status}" />
+                            <GridViewColumn Header="进度" Width="60" DisplayMemberBinding="{Binding ProgressText}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

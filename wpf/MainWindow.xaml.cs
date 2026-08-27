@@ -42,6 +42,17 @@ public sealed class FileItem : INotifyPropertyChanged
 
     public string ProgressText => _progress > 0 ? $"{_progress}%" : "";
 
+    private string _info = "解析中";
+    public string Info
+    {
+        get => _info;
+        set
+        {
+            _info = value;
+            OnPropertyChanged(nameof(Info));
+        }
+    }
+
     public FileItem(string fullPath) => FullPath = fullPath;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -154,6 +165,7 @@ public partial class MainWindow : FluentWindow
 
     private void AddFiles(IEnumerable<string> paths)
     {
+        var added = new List<FileItem>();
         foreach (string p in paths)
         {
             if (Directory.Exists(p))
@@ -178,7 +190,31 @@ public partial class MainWindow : FluentWindow
             }
             if (_files.Any(f => string.Equals(f.FullPath, p, StringComparison.OrdinalIgnoreCase)))
                 continue;
-            _files.Add(new FileItem(p));
+            var item = new FileItem(p);
+            _files.Add(item);
+            added.Add(item);
+        }
+        if (added.Count > 0)
+            ProbeNewFiles(added);
+    }
+
+    private async void ProbeNewFiles(List<FileItem> items)
+    {
+        if (_ffprobe is null)
+        {
+            foreach (FileItem item in items)
+                item.Info = "未找到 ffprobe";
+            return;
+        }
+        foreach (FileItem item in items)
+        {
+            MediaInfo? info = await MediaProbe.ProbeAsync(_ffprobe, item.FullPath);
+            item.Info = info switch
+            {
+                null => "解析失败",
+                { Error: not null } => "解析失败",
+                _ => info.Summary,
+            };
         }
     }
 
