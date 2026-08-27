@@ -1,18 +1,36 @@
 # MICA RETRO CONVERTER
 
-将现代视频转换为 Windows 98 可播放的 ASF 格式。基于 Tauri 2.x + Python FastAPI + FFmpeg 构建的极简桌面工具。
+把现代视频转换为 Windows 98 能直接播放的老格式。WPF (.NET 8) 原生 Windows 程序，基于 FFmpeg。
+
+一台现代电脑上的时光机：拖进去一个 4K 视频，拿出来一张能塞进当年 VCD 机的碟片内容。
 
 ---
 
 ## 功能
 
-- 拖放添加视频文件（支持文件夹递归扫描）
-- 转换为 Win98 兼容的 ASF 容器（WMV2 编码 + WMA2 音频）
-- 可选 4:3 画面比例、烧录字幕
-- 输出文件自动加 `_win98` 后缀，不覆盖原文件
-- 窗口置顶（图钉按钮）
-- 自定义标题栏，支持拖动
-- 宽度锁定 320px，高度可调（520px 起）
+- **拖放添加**视频文件（支持整个文件夹递归扫描），列表自动显示文件信息（分辨率/编码/帧率/码率/时长）
+- **15 个预设**，覆盖当年主流格式（见下表）
+- **Letterbox 4:3 黑边**（默认开启）：宽屏视频加黑边适配老电视，不拉伸变形
+- **帧率控制**：VCD/DVD 强制规格帧率，其他格式可选常见帧率或保持原帧率
+- **字幕烧录**：自动发现同名 `.srt/.ass/.ssa/.sub` 字幕并烧录进画面
+- **批量转换**：单文件进度 + 总进度，可随时取消
+- **Windows 11 原生体验**：Mica 材质背景、窗口圆角、明暗主题跟随系统（可手动切换）、任务栏图标进度条、Snackbar 完成通知
+- **`--selftest` 自测**：自动生成测试源 → 转 ASF → ffprobe 校验编码，一条命令验证环境完好
+- 输出文件自动加后缀（如 `_win98`），永不覆盖原文件
+
+---
+
+## 预设一览
+
+| 分组 | 预设 | 规格要点 |
+|---|---|---|
+| Win98 流媒体 | ASF 标准 / 高质量 / 最小体积 | WMV2 + WMA2 → ASF，640×480 / 800×600 / 320×240 |
+| VCD | PAL / NTSC | MPEG-1 + MP2，352×288@25 / 352×240@29.97，1150k |
+| SVCD | PAL / NTSC | MPEG-2 + MP2，480×576 / 480×480，2500k |
+| DVD | PAL / NTSC | MPEG-2 + AC-3，720×576 / 720×480，6000k，输出 .vob |
+| MPEG-4 AVI | DivX / Xvid | MPEG-4（DX50/XVID 标签） |
+| RealNetworks | RM | RV10 + real_144 音频 |
+| 占位 | RMVB | 暂不可用（置灰） |
 
 ---
 
@@ -20,10 +38,9 @@
 
 | 层 | 技术 | 说明 |
 |---|---|---|
-| 桌面壳 | Tauri 2.x (Rust) | 无边框窗口、自定义标题栏、文件拖放捕获、Python sidecar 管理 |
-| 前端 | Vite + Vanilla JS | 三段式布局：标题栏 / 任务列表 / 悬浮底部卡片 |
-| 后端 | Python FastAPI | FFmpeg 进程调用、SSE 实时进度推送 |
-| 转换核心 | FFmpeg | WMV2 视频编码 + WMA2 音频编码 → ASF 容器 |
+| 界面 | WPF (.NET 8) + WPF-UI 3.0.5 | FluentWindow / Mica / Snackbar / TaskBarProgress |
+| 转换核心 | FFmpeg | 进程调用，stderr 实时解析进度，双管道并行读取防死锁 |
+| 探测 | FFprobe | JSON 输出，解析分辨率/编码/帧率/码率/时长 |
 
 ---
 
@@ -31,133 +48,53 @@
 
 ```
 win98-asf-converter/
-├── index.html              # 前端入口
-├── src/
-│   ├── app.js              # 前端逻辑（拖放、任务列表、窗口控制）
-│   └── styles.css         # MICA 风格样式
-├── vite.config.js          # Vite 配置（端口 1420）
-├── server.py               # FastAPI 后端（SSE 进度推送）
-├── converter_core.py       # FFmpeg 转换核心逻辑
-├── converter.py            # 转换入口
-├── main.py                # Python 独立运行入口
-├── requirements.txt       # Python 依赖
-├── ffmpeg/                # FFmpeg 二进制（需自行放入）
-│   ├── ffmpeg.exe         # ← 不在仓库中，需下载
-│   ├── ffprobe.exe        # ← 不在仓库中，需下载
-│   └── .gitkeep
-├── src-tauri/
-│   ├── src/main.rs        # Rust 后端（窗口事件、sidecar、拖放）
-│   ├── tauri.conf.json    # Tauri 窗口配置
-│   ├── Cargo.toml         # Rust 依赖
-│   ├── capabilities/
-│   │   └── default.json  # 权限配置（拖放、置顶、拖拽窗口）
-│   ├── build.rs           # Tauri 构建脚本
-│   └── icons/             # 应用图标
-└── package.json           # Node 依赖与脚本
+├── wpf/                       # WPF 程序（当前实现）
+│   ├── Win98Converter.csproj
+│   ├── AssemblyInfo.cs        # WPF 主题资源程序集信息
+│   ├── App.xaml(.cs)          # 启动：--selftest 分支 / 主题初始化
+│   ├── MainWindow.xaml(.cs)   # 主界面：拖放、列表、设置、日志
+│   └── Core/
+│       ├── Preset.cs          # 预设数据模型
+│       ├── Presets.cs         # 15 个预设定义 + 帧率选项
+│       ├── ConversionEngine.cs # ffmpeg 命令构造/进度解析/转换执行
+│       ├── MediaProbe.cs      # ffprobe 文件信息探测
+│       └── SelfTest.cs        # --selftest 端到端自测
+├── ffmpeg/                    # FFmpeg 二进制（不在仓库中，需自行放入）
+├── docs/                      # 设计文档（预设编辑器 v3.1 规划等）
+├── QUEST.md                   # 任务清单（已完成 / 待办）
+└── CHANGELOG.md               # 更新日志
 ```
 
 ---
 
 ## 环境要求
 
-### 必需
-
-- **Node.js** >= 18
-- **Rust** (stable, `x86_64-pc-windows-gnu` 工具链)
-- **Python** >= 3.10
-- **FFmpeg** 二进制文件（放入 `ffmpeg/` 目录）
-
-### Python 依赖
-
-```bash
-pip install -r requirements.txt
-# fastapi, uvicorn, PyQt5
-```
-
-### FFmpeg 放置
-
-从 [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) 下载 essentials build，将以下文件放入 `ffmpeg/` 目录：
-
-```
-ffmpeg/
-├── ffmpeg.exe
-└── ffprobe.exe
-```
+- **Windows 10/11**（运行）
+- **.NET 8 SDK**（仅编译时需要）
+- **FFmpeg**：从 [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) 或 BtbN builds 下载，把 `ffmpeg.exe` 和 `ffprobe.exe` 放入项目的 `ffmpeg/` 目录
 
 ---
 
-## 开发
+## 构建与运行
 
-```bash
-# 安装 Node 依赖
-npm install
+```powershell
+# 编译
+dotnet build wpf\Win98Converter.csproj -c Debug
 
-# 安装 Python 依赖
-pip install -r requirements.txt
+# 运行
+.\wpf\bin\Debug\net8.0-windows10.0.19041.0\Win98Converter.exe
 
-# 启动开发模式（同时启动 Vite + Tauri + Python sidecar）
-npm run tauri dev
+# 环境自测（退出码 0 = 通过）
+.\wpf\bin\Debug\net8.0-windows10.0.19041.0\Win98Converter.exe --selftest
 ```
 
-### 构建发布版
-
-```bash
-npm run tauri:build
-```
+FFmpeg 查找顺序：程序目录的 `ffmpeg/` 子目录 → 程序同级目录 → 向上最多 5 层父目录的 `ffmpeg/` → 系统 PATH。
 
 ---
 
-## 转换参数
+## 历史版本
 
-| 参数 | 默认值 | 说明 |
-|---|---|---|
-| 视频编码 | WMV2 | Windows Media Video 8，Win98 兼容 |
-| 音频编码 | WMA2 | Windows Media Audio 9 |
-| 容器 | ASF | Advanced Systems Format |
-| 分辨率 | 可选 320x240 / 640x480 / 原始 | Win98 推荐 320x240 |
-| 码率 | 可选 512K / 1M / 2M | 越低兼容性越好 |
-| 帧率 | 可选 15 / 24 / 30 fps | Win98 推荐 24fps |
-| 画面比例 | 可选 4:3 | 裁剪为 4:3 适配老式 CRT 显示器 |
-| 字幕烧录 | 可选 | 将字幕硬编码到画面 |
-
----
-
-## 窗口配置
-
-```json
-// tauri.conf.json
-{
-  "width": 320, "height": 640,
-  "minWidth": 320, "maxWidth": 320,
-  "minHeight": 520,
-  "decorations": false,
-  "transparent": false,
-  "dragDropEnabled": true
-}
-```
-
-- 宽度锁定 320px（`minWidth = maxWidth = 320`）
-- 高度可调（`minHeight = 520`，无上限）
-- 无系统边框（`decorations: false`），自定义标题栏
-- 纯色背景（`transparent: false`）
-- 允许文件拖放（`dragDropEnabled: true`）
-
----
-
-## 拖放实现
-
-拖放采用 Rust 层 `on_window_event(DragDrop)` 直接捕获，绕开 WebView2 沙箱限制，确保拿到操作系统级的绝对路径：
-
-```
-Explorer 拖入
-  → Rust WindowEvent::DragDrop
-  → emit("drag://drop", Vec<String> paths)
-  → 前端 listen("drag://drop") → addFilePaths(paths)
-```
-
-同时保留 HTML5 DnD 作为 fallback，双通道 500ms 去重防止重复添加。
-
----
+v1 为 Python FastAPI + Web 前端，v2 为 Tauri 2.x 桌面版，均已被 WPF 版（v3）取代。旧实现代码保留在 git 历史中。
 
 ## License
 

@@ -6,6 +6,7 @@
 - **目录整理**：旧的 Python/Web/Tauri 实现、设计稿、过时的 HANDOVER.md 全部移入 `toberemoved/`（.gitignore 已排除，待老板确认后删除）
 - **Git**：合并推送了远程两个旧提交（实时进度反馈功能、交接文档），未覆盖历史
 - **清理**：确认 `toberemoved/` 不需要后整个删除，释放约 40MB；发现遗留的预设编辑器设计稿 `docs/preset-editor-spec.md`（v3.1 规划），保留待用
+- **文档**：README 重写为 WPF 版说明（功能/预设表/构建方法），替换已废弃的 Tauri 版描述
 
 ## 2026-08-27 — WPF 原生重构（v3.0.0）
 
