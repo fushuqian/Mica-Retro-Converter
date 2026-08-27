@@ -39,7 +39,7 @@ public static class Presets
             Container = "vcd", OutputExt = "mpg", Suffix = "vcd",
             Width = 352, Height = 288, Fps = 25.0, ForceFps = true,
             VideoBitrate = 1150, AudioBitrate = 224, AudioSampleRate = 44100,
-            ExtraArgs = new[] { "-g", "18" },
+            ExtraArgs = new[] { "-g", "15" },
             Desc = "352×288@25fps · 1150k MPEG-1 + 224k MP2 · PAL 标准",
         },
         new()
