@@ -76,7 +76,7 @@
                                                         <Setter Property="Foreground" Value="{ui:ThemeResource TextFillColorSecondaryBrush}" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Status}" Value="转换中">
-                                                                <Setter Property="Foreground" Value="{ui:ThemeResource SystemAccentColorDefaultBrush}" />
+                                                                <Setter Property="Foreground" Value="{ui:ThemeResource SystemAccentColorPrimaryBrush}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Status}" Value="完成">
                                                                 <Setter Property="Foreground" Value="{ui:ThemeResource SystemFillColorSuccessBrush}" />

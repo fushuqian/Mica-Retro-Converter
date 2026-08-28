@@ -59,7 +59,7 @@ public static class Presets
             Container = "svcd", OutputExt = "mpg", Suffix = "svcd",
             Width = 480, Height = 576, Fps = 25.0, ForceFps = true,
             VideoBitrate = 2500, AudioBitrate = 224, AudioSampleRate = 44100,
-            ExtraArgs = new[] { "-g", "18" },
+            ExtraArgs = new[] { "-g", "15" },
             Desc = "480×576@25fps · MPEG-2 + MP2 · PAL 标准",
         },
         new()
@@ -90,7 +90,7 @@ public static class Presets
             Container = "dvd", OutputExt = "vob", Suffix = "dvd",
             Width = 720, Height = 480, Fps = 29.97, ForceFps = true,
             VideoBitrate = 6000, AudioBitrate = 448, AudioSampleRate = 48000,
-            ExtraArgs = new[] { "-g", "15" },
+            ExtraArgs = new[] { "-g", "18" },
             Desc = "720×480@29.97fps · NTSC 标准",
         },
 

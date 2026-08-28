@@ -20,11 +20,16 @@
 - [x] 目录整理（2026-08-28）：旧 Python/Web/Tauri 实现、设计稿、HANDOVER.md 全部移入 `toberemoved/`（git 忽略，待删除）
 - [x] 合并 GitHub 远程旧提交（实时进度反馈功能 + 交接文档）并推送，提交历史完整保留
 - [x] 确认并删除 `toberemoved/`（2026-08-28），释放约 40MB
+- [x] 修复卡片视图闪退（2026-08-28）：`MainWindow.xaml` 中 `SystemAccentColorDefaultBrush` → `SystemAccentColorPrimaryBrush`（WPF-UI 3.0.5 中前者不存在，卡片首次实例化时抛 XamlParseException 崩溃）
 
 ## 待办 / 未来
 
 - [ ] 画面比例参数（SAR/`-aspect`）：曾讨论给 VCD/SVCD/DVD 预设加 DAR 选项（方案B：UI 下拉，支持 16:9 宽屏 DVD），老板决定先搁置——当前统一 4:3 letterbox 已够用，当年电视清一色 4:3，宽屏碟片场景以后再说
-- [x] ~~决定是否修复 VCD-PAL 预设 `-g 18`~~ → 已修复：GOP 改为规格值 `-g 15`（PAL 25fps，VCD 规格 GOP=0.6 秒=15 帧，2026-08-28）
+- [x] ~~决定是否修复 VCD/SVCD/DVD 预设 GOP 值~~ → 已修复：
+  - VCD-PAL `-g 18` → `-g 15`（PAL 25fps × 0.6s = 15 帧）
+  - SVCD-PAL `-g 18` → `-g 15`（同上，MPEG-2 同样规格）
+  - DVD-NTSC `-g 15` → `-g 18`（NTSC 29.97fps × 0.6s ≈ 18 帧）
+  - 修复时间 2026-08-28
 - [ ] RMVB 预设补全（当前占位置灰，vcodec/acodec/container 待定）
 - [ ] 真实视频 + 同名字幕的字幕烧录验证
 - [ ] GUI 手动走查：多文件批量转换、取消按钮、主题切换按钮

@@ -9,6 +9,9 @@
 - **文档**：README 重写为 WPF 版说明（功能/预设表/构建方法），替换已废弃的 Tauri 版描述
 - **文件列表改为卡片式**：每个文件一张圆角卡片（文件名/文件信息/状态行）替换原表格视图；状态按颜色区分（转换中/完成/失败）；卡片悬停显示完整路径；新增卡片内删除按钮（Delete 键删除仍保留）
 - **修复 VCD-PAL GOP**：`-g 18` → `-g 15`（PAL 25fps 按 VCD 规格 GOP 应为 0.6 秒=15 帧，原值沿用自旧版笔误）；已实测 25fps+`-g 15`+vcd 容器编码通过
+- **修复卡片视图闪退**：`MainWindow.xaml` 中"转换中"状态的 `SystemAccentColorDefaultBrush` → `SystemAccentColorPrimaryBrush`（WPF-UI 3.0.5 枚举中不存在 DefaultBrush，DataTemplate 实例化时抛 XamlParseException 导致进程崩溃）
+- **修复 SVCD-PAL GOP**：`-g 18` → `-g 15`（与 VCD-PAL 同理，MPEG-2 PAL 25fps × 0.6s = 15 帧）
+- **修复 DVD-NTSC GOP**：`-g 15` → `-g 18`（NTSC 29.97fps × 0.6s ≈ 18 帧，与前两次对称的 PAL/NTSC 写反问题）
 
 ## 2026-08-27 — WPF 原生重构（v3.0.0）
 
