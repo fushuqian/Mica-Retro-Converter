@@ -1,0 +1,59 @@
+<ui:FluentWindow x:Class="Win98Converter.PresetEditorWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 Title="预设编辑器"
+                 Width="900" Height="600"
+                 MinWidth="750" MinHeight="500"
+                 WindowStartupLocation="CenterOwner">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+            <ui:Button Content="新建预设" Icon="{ui:SymbolIcon Add24}" Click="New_Click" />
+            <ui:Button Content="复制选中" Icon="{ui:SymbolIcon Copy24}" Click="Copy_Click" Margin="8,0,0,0" />
+            <ui:Button Content="删除选中" Icon="{ui:SymbolIcon Delete24}" Click="Delete_Click" Margin="8,0,0,0" />
+            <ui:Button Content="导入 JSON" Icon="{ui:SymbolIcon Upload24}" Click="Import_Click" Margin="8,0,0,0" />
+            <ui:Button Content="导出 JSON" Icon="{ui:SymbolIcon Download24}" Click="Export_Click" Margin="8,0,0,0" />
+            <TextBlock x:Name="StatusText" Margin="12,4,0,0" VerticalAlignment="Center"
+                       Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+        </StackPanel>
+
+        <!-- Presets DataGrid -->
+        <DataGrid x:Name="PresetGrid" Grid.Row="1" AutoGenerateColumns="False"
+                  IsReadOnly="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                  GridLinesVisibility="Horizontal" HeadersVisibility="Column"
+                  RowHeight="28"
+                  Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
+                  BorderThickness="1"
+                  BorderBrush="{ui:ThemeResource ControlStrokeColorDefaultBrush}"
+                  SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="状态" Binding="{Binding IsBuiltinText}" Width="50" IsReadOnly="True" />
+                <DataGridTextColumn Header="分组" Binding="{Binding Group}" Width="100" />
+                <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="140" />
+                <DataGridTextColumn Header="视频编码" Binding="{Binding VideoCodec}" Width="80" />
+                <DataGridTextColumn Header="音频编码" Binding="{Binding AudioCodec}" Width="80" />
+                <DataGridTextColumn Header="容器" Binding="{Binding Container}" Width="60" />
+                <DataGridTextColumn Header="宽" Binding="{Binding Width}" Width="40" />
+                <DataGridTextColumn Header="高" Binding="{Binding Height}" Width="40" />
+                <DataGridTextColumn Header="视频码率" Binding="{Binding VideoBitrate}" Width="70" />
+                <DataGridTextColumn Header="音频码率" Binding="{Binding AudioBitrate}" Width="70" />
+                <DataGridTextColumn Header="输出扩展" Binding="{Binding OutputExt}" Width="70" />
+                <DataGridTextColumn Header="描述" Binding="{Binding Desc}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Bottom buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <ui:Button Content="恢复默认" Click="Reset_Click" Appearance="Transparent" Margin="0,0,12,0" />
+            <ui:Button Content="保存" Click="Save_Click" Appearance="Primary" IsDefault="True" />
+            <ui:Button Content="取消" Click="Cancel_Click" Margin="8,0,0,0" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

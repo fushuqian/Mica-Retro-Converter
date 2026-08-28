@@ -21,18 +21,18 @@
 - [x] 合并 GitHub 远程旧提交（实时进度反馈功能 + 交接文档）并推送，提交历史完整保留
 - [x] 确认并删除 `toberemoved/`（2026-08-28），释放约 40MB
 - [x] 修复卡片视图闪退（2026-08-28）：`MainWindow.xaml` 中 `SystemAccentColorDefaultBrush` → `SystemAccentColorPrimaryBrush`（WPF-UI 3.0.5 中前者不存在，卡片首次实例化时抛 XamlParseException 崩溃）
+- [x] RMVB 预设替换为 RM(RV20 高画质)（2026-08-28）：RealNetworks 已退出编解码业务，无合法开源 RV30/RV40 编码器，将占位 RMVB 预设替换为基于 ffmpeg RV20 编码的高画质 RM 预设
+- [x] 画面比例 SAR/`-aspect` 参数支持（2026-08-28）：UI 新增下拉（保持原比例/4:3/16:9/16:10/1:1/3:2/2.35:1），ConversionEngine 的 BuildFilterChain/BuildFfmpegCommand/ConvertAsync 全链路支持 aspectRatio 参数
+- [x] 预设编辑器 Phase1（2026-08-28）：
+  - [x] `presets.builtin.json` 生成内置预设数据文件
+  - [x] `PresetRegistry` 类管理预设加载/保存/增删改查（区分内置与用户预设）
+  - [x] `Presets` 静态类改为从 Registry 加载
+  - [x] `PresetEditorWindow` 预设编辑窗口（DataGrid 编辑 + 新建/复制/删除/重置/导入/导出/保存 + 取消）
+  - [x] 主窗口"编辑预设"按钮接入
 
 ## 待办 / 未来
 
-- [ ] 画面比例参数（SAR/`-aspect`）：曾讨论给 VCD/SVCD/DVD 预设加 DAR 选项（方案B：UI 下拉，支持 16:9 宽屏 DVD），老板决定先搁置——当前统一 4:3 letterbox 已够用，当年电视清一色 4:3，宽屏碟片场景以后再说
-- [x] ~~决定是否修复 VCD/SVCD/DVD 预设 GOP 值~~ → 已修复：
-  - VCD-PAL `-g 18` → `-g 15`（PAL 25fps × 0.6s = 15 帧）
-  - SVCD-PAL `-g 18` → `-g 15`（同上，MPEG-2 同样规格）
-  - DVD-NTSC `-g 15` → `-g 18`（NTSC 29.97fps × 0.6s ≈ 18 帧）
-  - 修复时间 2026-08-28
-- [ ] RMVB 预设补全（当前占位置灰，vcodec/acodec/container 待定）
 - [ ] 真实视频 + 同名字幕的字幕烧录验证
 - [ ] GUI 手动走查：多文件批量转换、取消按钮、主题切换按钮
-- [ ] 预设编辑器（v3.1 规划）：自定义预设增删改查/持久化/JSON 导入导出，设计稿 `docs/preset-editor-spec.md` 已就绪，待老板拍板开工
+- [ ] 预设编辑器 Phase2：内置预设字段校验（码率范围/分辨率合理性）、分组/搜索/排序、撤销重做
 - [ ] 发布打包（单文件发布 / 安装包）
-

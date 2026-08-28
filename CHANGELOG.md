@@ -1,5 +1,18 @@
 # 更新日志
 
+## 2026-08-28 — RMVB替换 + 画面比例 + 预设编辑器 Phase1
+
+- **RMVB 预设替换为 RM(RV20 高画质)**：经调研 RealNetworks 已退出媒体编解码业务，无合法开源 RV30/RV40 编码器可用。将原占位 RMVB 预设替换为基于 ffmpeg RV20 编码的高画质 RM 预设，并通过 selftest 验证编码正常
+- **画面比例 SAR/`-aspect` 参数支持**：UI 新增 AspectCombo 下拉（保持原比例/4:3/16:9/16:10/1:1/3:2/2.35:1），ConversionEngine 的 BuildFilterChain/BuildFfmpegCommand/ConvertAsync 全链路支持 aspectRatio 参数传递
+- **预设编辑器 Phase1**：
+  - `presets.builtin.json`：内置预设数据文件，包含全部 15 个预设的 JSON 序列化数据
+  - `PresetRegistry` 类：管理预设加载（内置+用户）、保存、增删改查，区分内置只读与用户可编辑预设
+  - `Presets` 静态类重构：改为从 PresetRegistry 加载预设，Initialize(baseDir) 初始化
+  - `PresetEditorWindow` 编辑窗口：DataGrid 直接编辑预设字段，支持新建/复制/删除/重置全部用户预设/JSON 导入导出/保存/取消
+  - 主窗口"编辑预设"按钮接入，保存后自动刷新预设列表
+  - 修复编译错误：MessageBox 命名空间冲突（Wpf.Ui vs System.Windows）、PresetRow.Preset 属性只读、Count 方法组比较
+  - selftest 通过：ExitCode 0，编码校验 wmv2+wmav2+asf PASS
+
 ## 2026-08-28 — 文件信息显示 + 目录整理
 
 - **文件信息显示**：文件列表新增"文件信息"列，拖入文件后自动用 ffprobe 探测并显示分辨率、视频/音频编码、帧率、码率、时长（如 `1920×1080 · h264 · 23.98fps · 2.1Mbps · 01:23:45`）。新增 `wpf/Core/MediaProbe.cs`，解析 JSON 输出，20 秒超时保护，探测失败不阻塞转换

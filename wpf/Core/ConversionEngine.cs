@@ -112,7 +112,7 @@ public static class ConversionEngine
         return null;
     }
 
-    public static string? BuildFilterChain(Preset settings, string? subtitlePath, bool letterbox)
+    public static string? BuildFilterChain(Preset settings, string? subtitlePath, bool letterbox, string? aspectRatio = null)
     {
         int width = settings.Width > 0 ? settings.Width : 640;
         int height = settings.Height > 0 ? settings.Height : 480;
@@ -140,11 +140,11 @@ public static class ConversionEngine
     }
 
     public static List<string> BuildFfmpegCommand(string ffmpegPath, string inputFile, string outputFile,
-        Preset settings, string? subtitlePath = null, bool letterbox = false)
+        Preset settings, string? subtitlePath = null, bool letterbox = false, string? aspectRatio = null)
     {
         var cmd = new List<string> { ffmpegPath, "-y", "-i", inputFile };
 
-        string? vf = BuildFilterChain(settings, subtitlePath, letterbox);
+        string? vf = BuildFilterChain(settings, subtitlePath, letterbox, aspectRatio);
         if (vf is not null)
         {
             cmd.Add("-vf");
@@ -152,6 +152,11 @@ public static class ConversionEngine
         }
 
         cmd.AddRange(new[] { "-c:v", settings.VideoCodec, "-b:v", $"{settings.VideoBitrate}k", "-pix_fmt", "yuv420p" });
+
+        if (!string.IsNullOrEmpty(aspectRatio))
+        {
+            cmd.AddRange(new[] { "-aspect", aspectRatio });
+        }
 
         if (settings.Fps.HasValue)
         {
@@ -238,15 +243,15 @@ public static class ConversionEngine
 
     public static async Task<ConversionResult> ConvertAsync(
         string ffmpegPath, string? ffprobePath, string inputFile, Preset settings,
-        string? outputDir, bool burnSubtitles, bool letterbox,
-        Action<int>? onProgress, Action<string>? onLog, CancellationToken ct)
+        string? outputDir, bool burnSubtitles, bool letterbox, string? aspectRatio = null,
+        Action<int>? onProgress = null, Action<string>? onLog = null, CancellationToken ct = default)
     {
         string outputFile = ResolveOutputPath(inputFile, settings, outputDir);
         string? subtitlePath = burnSubtitles ? FindSubtitleForVideo(inputFile) : null;
         if (burnSubtitles && subtitlePath is not null)
             onLog?.Invoke($"[字幕] 发现同名字幕: {subtitlePath}");
 
-        List<string> cmd = BuildFfmpegCommand(ffmpegPath, inputFile, outputFile, settings, subtitlePath, letterbox);
+        List<string> cmd = BuildFfmpegCommand(ffmpegPath, inputFile, outputFile, settings, subtitlePath, letterbox, aspectRatio);
         onLog?.Invoke("$ \"" + string.Join("\" \"", cmd) + "\"");
 
         double? duration = await GetMediaDurationAsync(ffprobePath, inputFile);

@@ -125,9 +125,14 @@
                         </ComboBox>
                         <TextBlock x:Name="PresetDescText" TextWrapping="Wrap" FontSize="12" Margin="0,6,0,0"
                                    Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}" />
+                        <ui:Button Content="编辑预设..." Appearance="Transparent" FontSize="12"
+                                   HorizontalAlignment="Left" Margin="0,4,0,0" Click="EditPresets_Click" />
 
                         <TextBlock Text="帧率（预设强制帧率时忽略）" Margin="0,12,0,4" />
                         <ComboBox x:Name="FpsCombo" HorizontalAlignment="Stretch" DisplayMemberPath="Label" />
+
+                        <TextBlock Text="画面比例（SAR/-aspect）" Margin="0,10,0,4" />
+                        <ComboBox x:Name="AspectCombo" HorizontalAlignment="Stretch" DisplayMemberPath="Label" />
 
                         <CheckBox x:Name="LetterboxCheck" Content="Letterbox 4:3 加黑边（推荐）" IsChecked="True" Margin="0,12,0,0" />
                         <CheckBox x:Name="BurnSubCheck" Content="烧录同名字幕 (.srt/.ass/.ssa/.sub)" IsChecked="True" />

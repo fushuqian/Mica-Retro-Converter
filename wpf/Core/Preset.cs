@@ -20,4 +20,5 @@ public sealed record Preset
     public IReadOnlyList<string> ExtraArgs { get; init; } = [];
     public string Desc { get; init; } = "";
     public bool Disabled { get; init; }
+    public string? AspectRatio { get; init; }
 }

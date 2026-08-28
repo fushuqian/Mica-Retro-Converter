@@ -35,6 +35,7 @@ public static class SelfTest
     private static async Task<int> RunCoreAsync()
     {
         string baseDir = AppContext.BaseDirectory;
+        Presets.Initialize(baseDir);
         string? ffmpeg = ConversionEngine.FindFfmpeg(baseDir);
         string? ffprobe = ConversionEngine.FindFfprobe(baseDir);
         Log("ffmpeg : " + (ffmpeg ?? "未找到"));

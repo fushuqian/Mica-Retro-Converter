@@ -75,6 +75,11 @@ public partial class MainWindow : FluentWindow
         public override string ToString() => Label;
     }
 
+    private sealed record AspectItem(string Label, string? Value)
+    {
+        public override string ToString() => Label;
+    }
+
     private readonly ObservableCollection<FileItem> _files = new();
     private CancellationTokenSource? _cts;
     private string? _ffmpeg;
@@ -84,8 +89,13 @@ public partial class MainWindow : FluentWindow
     {
         InitializeComponent();
         FileListView.ItemsSource = _files;
+        
+        // Initialize preset registry (loads from presets.builtin.json + user presets)
+        Presets.Initialize(AppContext.BaseDirectory);
+        
         InitPresets();
         InitFpsOptions();
+        InitAspectOptions();
 
         _ffmpeg = ConversionEngine.FindFfmpeg(AppContext.BaseDirectory);
         _ffprobe = ConversionEngine.FindFfprobe(AppContext.BaseDirectory);
@@ -107,6 +117,12 @@ public partial class MainWindow : FluentWindow
         FpsCombo.SelectedIndex = 0;
     }
 
+    private void InitAspectOptions()
+    {
+        AspectCombo.ItemsSource = Presets.AspectRatioOptions.Select(o => new AspectItem(o.Label, o.Value)).ToList();
+        AspectCombo.SelectedIndex = 0;
+    }
+
     private void PresetCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (PresetCombo.SelectedItem is not PresetItem item)
@@ -115,6 +131,21 @@ public partial class MainWindow : FluentWindow
         PresetDescText.Text = preset.Desc;
         FpsCombo.IsEnabled = !preset.ForceFps;
         SelectFps(preset.ForceFps ? preset.Fps : null);
+    }
+
+    private void EditPresets_Click(object sender, RoutedEventArgs e)
+    {
+        var editor = new PresetEditorWindow(Presets.Registry)
+        {
+            Owner = this
+        };
+        var result = editor.ShowDialog();
+        if (result == true)
+        {
+            // Refresh preset combo after editing
+            InitPresets();
+            AppendLog("[预设] 用户预设已更新");
+        }
     }
 
     private void SelectFps(double? value)
@@ -252,6 +283,7 @@ public partial class MainWindow : FluentWindow
         bool letterbox = LetterboxCheck.IsChecked == true;
         bool burnSubs = BurnSubCheck.IsChecked == true;
         string? outDir = string.IsNullOrWhiteSpace(OutputDirBox.Text) ? null : OutputDirBox.Text.Trim();
+        string? aspectRatio = (AspectCombo.SelectedItem as AspectItem)?.Value;
 
         SetBusy(true);
         _cts = new CancellationTokenSource();
@@ -269,7 +301,7 @@ public partial class MainWindow : FluentWindow
                 try
                 {
                     var result = await ConversionEngine.ConvertAsync(
-                        _ffmpeg, _ffprobe, item.FullPath, preset, outDir, burnSubs, letterbox,
+                        _ffmpeg, _ffprobe, item.FullPath, preset, outDir, burnSubs, letterbox, aspectRatio,
                         onProgress: p => Dispatcher.Invoke(() => item.Progress = p),
                         onLog: l => Dispatcher.Invoke(() => AppendLog(l)),
                         ct: _cts.Token);
@@ -320,6 +352,7 @@ public partial class MainWindow : FluentWindow
         CancelButton.IsEnabled = busy;
         PresetCombo.IsEnabled = !busy;
         FpsCombo.IsEnabled = !busy && !((PresetCombo.SelectedItem as PresetItem)?.Preset.ForceFps ?? false);
+        AspectCombo.IsEnabled = !busy;
         LetterboxCheck.IsEnabled = !busy;
         BurnSubCheck.IsEnabled = !busy;
         if (busy)
